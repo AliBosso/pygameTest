@@ -17,6 +17,19 @@ player = pygame.transform.scale(player, (40, 100))
 player_rect = player.get_rect(midbottom=(640, ground_y))
 
 
+#player vars
+temp_posx = player_rect.x
+temp_posy = player_rect.y
+
+
+
+def levels():
+    if (player_rect.x <= 1250):
+        player_rect.x = 640
+        player_rect.y = ground_y
+
+
+
 def moving():
   global velocity_y, on_ground  # NEW: on_ground added
   keys = pygame.key.get_pressed()
@@ -25,16 +38,13 @@ def moving():
   previous_left = player_rect.left
   previous_right = player_rect.right
 
-  # JUMP: CHANGED: uses on_ground so you can also jump from the box
   if keys[pygame.K_UP] and on_ground:
     velocity_y = -20
-
   # LEFT / RIGHT
   if keys[pygame.K_LEFT]:
     player_rect.x -= 5
   if keys[pygame.K_RIGHT]:
     player_rect.x += 5
-
 
   velocity_y += 1 # NEW: where the feet were before moving
   player_rect.y += velocity_y
@@ -85,7 +95,7 @@ while running:
 
     screen.blit(background, (0, 0))
     for box in boxes:
-      objects("black", box.topleft, box.size)
+      objects("dark Green", box.topleft, box.size)
     screen.blit(player, player_rect)
 
     pygame.display.flip()
