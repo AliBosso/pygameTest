@@ -54,9 +54,9 @@ def moving():
         velocity_y = -20
     # LEFT / RIGHT
     if keys[pygame.K_LEFT]:
-        player_rect.x -= 5
+        player_rect.x -= 15
     if keys[pygame.K_RIGHT]:
-        player_rect.x += 5
+        player_rect.x += 15
 
     velocity_y += 1 
     player_rect.y += velocity_y
@@ -106,8 +106,8 @@ while running:
     screen.blit(player, player_rect)
 
     pygame.display.flip()
-    clock.tick(300)
-    dt = clock.tick(300) / 1000
+    clock.tick(1000)
+    dt = clock.tick(100) / 1000  # Delta time in seconds.
 
 pygame.quit()
 
