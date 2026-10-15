@@ -7,8 +7,6 @@ running = True
 dt = 0
 
 # Sprites
-# For testing purposes, substitute fallback surfaces if images are missing
-# Sprites
 background = pygame.image.load("bg.png")
 background = pygame.transform.scale(background, screen.get_size())
 
@@ -16,6 +14,7 @@ spikes = pygame.image.load("spike.png")
 
 player = pygame.image.load("player.png")
 player = pygame.transform.scale(player, (40, 100))
+
 
 # player vars
 ground_y = 590
@@ -28,6 +27,9 @@ player_rect = player.get_rect(midbottom=(player_start, ground_y))
 
 level = 0
 spikes_rect = spikes.get_rect() # CHANGED: Initialize the rect globally so collision detection can see it
+
+
+font = pygame.font.SysFont(None, 48)
 
 def objects(color, position, size):
     pygame.draw.rect(screen, color, pygame.Rect(position, size))
@@ -44,9 +46,13 @@ boxes2 = [
 
 def spikes_func():
     global spikes_rect
+    if level == 1:
         # Properly position the spike rect
-    spikes_rect.topleft = (400, ground_y - spikes_rect.height) # FIXED: Subtract height so it sits on top of the ground
-    screen.blit(spikes, spikes_rect)  # FIXED: Added the missing blit to actually show the spike
+        spikes_rect.topleft = (400, ground_y - spikes_rect.height) # FIXED: Subtract height so it sits on top of the ground
+        screen.blit(spikes, spikes_rect)
+    elif level == 2:
+        spikes_rect.topleft = (600, ground_y - spikes_rect.height) # FIXED: Subtract height so it sits on top of the ground
+        screen.blit(spikes, spikes_rect) # FIXED: Added the missing blit to actually show the spike
 
 def levels():
     global level, boxes
@@ -120,7 +126,7 @@ def moving():
 def is_touching_danger():
     global alive
     # FIXED: Re-enabled and checked against spikes_rect instead of the raw image
-    if level == 1 and player_rect.colliderect(spikes_rect):
+    if player_rect.colliderect(spikes_rect):
         alive = False
 
 def living():
@@ -129,6 +135,7 @@ def living():
         player_rect.midbottom = (player_start, ground_y)  # Reset player position
         velocity_y = 0
         alive = True
+
 
 while running:
     for event in pygame.event.get():
@@ -139,10 +146,15 @@ while running:
     is_touching_danger() # FIXED: Added back to loop
     living()
     levels()  
-    
+
+
+
+    level_text = "Level: " + str(level)
+    text_surface = font.render(level_text, True, "White")
     # Drawing Everything
     screen.blit(background, (0, 0))
-    
+    screen.blit(text_surface, (50, 50))
+
     for box in boxes:
         objects("dark green", box.topleft, box.size)
 
@@ -150,9 +162,11 @@ while running:
         for box2 in boxes2:
             objects("dark red", box2.topleft, box2.size)
         spikes_func() # Render spikes
+    if level == 2:
+        spikes_func()
         
     screen.blit(player, player_rect)
 
     pygame.display.flip()
-    clock.tick(144) 
+    clock.tick(65) 
 
