@@ -31,11 +31,12 @@ ground_y = 590
 velocity_y = 1
 on_ground = False
 alive = True  # FIXED: Needs to be global so functions can change it
+deaths = 0
 
 player_start = 50
 player_rect = player.get_rect(midbottom=(player_start, ground_y))
 
-level = 0
+level = 1
 spikes_rect = spikes.get_rect() # CHANGED: Initialize the rect globally so collision detection can see it
 
 
@@ -50,22 +51,25 @@ boxes = [
 ]
 
 boxes2 = [
-    pygame.Rect((900, 400), (100, 50)),
     pygame.Rect((700, 450), (100, 50)),
+    pygame.Rect((900, 400), (100, 50)),
+    pygame.Rect((900,450), (100, 50)),
+    pygame.Rect((900,500), (100, 50)),
+    pygame.Rect((900,540), (100, 50)),
 ]
 
 def spikes_func():#loops through the objetc list with the positions for the hitboxes, adn then in .blit(image var, pos of the hitbox)
-    if level == 1:
+    if level == 2:
         for spike in spikes_rects:
             screen.blit(spikes, spike)
-    elif level == 2:
+    elif level == 3:
         for spike in spikes_rects2:
             screen.blit(spikes, spike)
 
 
 # Create these right next to where you defined your boxes and boxes2 lists
 spikes_rects = [
-    pygame.Rect((920, 400 - 30), (30, 30)),     # Level 1 Spike on the box (Adjust 30, 30 to your image size)
+    pygame.Rect((935, 368), (30, 30)),     # Level 1 Spike on the box (Adjust 30, 30 to your image size)
     pygame.Rect((400, ground_y - 30), (30, 30)), # Level 1 Spike on the ground
 ]
 
@@ -80,10 +84,10 @@ def levels():
     if player_rect.x >= 1250:
         player_rect.midbottom = (player_start, ground_y) # FIXED: Safely snaps player back to ground
         level += 1
-        if level == 1:
-            boxes.clear()
-        if level == 2:
-            boxes2.clear()
+        # if level == 1:
+        #     boxes.clear()
+        # if level == 2:
+        #     boxes2.clear()
     elif player_rect.x <= 25:
         player_rect.midbottom = (player_start, ground_y)
 
@@ -121,22 +125,24 @@ def moving():
         on_ground = True
 
     # Check Box 1 Collisions
-    for box in boxes:
-        if player_rect.colliderect(box):
-            if velocity_y >= 0 and previous_bottom <= box.top:
-                player_rect.bottom = box.top
-                velocity_y = 0
-                on_ground = True
-            elif velocity_y < 0 and previous_top >= box.bottom:
-                player_rect.top = box.bottom
-                velocity_y = 0
-            elif previous_right <= box.left:
-                player_rect.right = box.left
-            elif previous_left >= box.right:
-                player_rect.left = box.right
+    # FIXED: Only check Box 1 Collisions if we are on Level 0
+    if level == 1:
+        for box in boxes:
+            if player_rect.colliderect(box):
+                if velocity_y >= 0 and previous_bottom <= box.top:
+                    player_rect.bottom = box.top
+                    velocity_y = 0
+                    on_ground = True
+                elif velocity_y < 0 and previous_top >= box.bottom:
+                    player_rect.top = box.bottom
+                    velocity_y = 0
+                elif previous_right <= box.left:
+                    player_rect.right = box.left
+                elif previous_left >= box.right:
+                    player_rect.left = box.right
     
     # Check Box 2 Collisions (Only active on Level 1)
-    if level == 1:
+    if level == 2:
         for box2 in boxes2:
             if player_rect.colliderect(box2):
                 if velocity_y >= 0 and previous_bottom <= box2.top:
@@ -151,26 +157,33 @@ def moving():
                 elif previous_left >= box2.right:
                     player_rect.left = box2.right
 
+
 def is_touching_danger():
     global alive
     
-    if level == 1:
+    if level == 2:
         for spike in spikes_rects:
             if player_rect.colliderect(spike):
                 alive = False
                 
-    elif level == 2:
+    elif level == 3:
         for spike in spikes_rects2:
             if player_rect.colliderect(spike):
                 alive = False
 
-
 def living():
-    global alive
+    global alive, deaths, level  # Added global keywords here
     if not alive:
         player_rect.midbottom = (player_start, ground_y)  # Reset player position
         velocity_y = 0
         alive = True
+        deaths += 1
+        
+    if deaths == 3:
+        level = 1
+        deaths = 0  # Reset deaths to 0 so the game loops properly
+
+    
 
 
 while running:
@@ -189,15 +202,15 @@ while running:
     # Drawing Everything
     screen.blit(background, (0, 0))
     screen.blit(text_surface, (50, 50))
-
-    for box in boxes:
-        objects("dark green", box.topleft, box.size)
-
     if level == 1:
+        for box in boxes:
+            objects("dark green", box.topleft, box.size)
+
+    if level == 2:
         for box2 in boxes2:
             objects("dark red", box2.topleft, box2.size)
         spikes_func() # Render spikes
-    if level == 2:
+    if level == 3:
         spikes_func()
         
     screen.blit(player, player_rect)
