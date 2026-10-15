@@ -44,15 +44,26 @@ boxes2 = [
     pygame.Rect((700, 450), (100, 50)),
 ]
 
-def spikes_func():
-    global spikes_rect
+def spikes_func():#loops through the objetc list with the positions for the hitboxes, adn then in .blit(image var, pos of the hitbox)
     if level == 1:
-        # Properly position the spike rect
-        spikes_rect.topleft = (400, ground_y - spikes_rect.height) # FIXED: Subtract height so it sits on top of the ground
-        screen.blit(spikes, spikes_rect)
+        for spike in spikes_rects:
+            screen.blit(spikes, spike)
     elif level == 2:
-        spikes_rect.topleft = (600, ground_y - spikes_rect.height) # FIXED: Subtract height so it sits on top of the ground
-        screen.blit(spikes, spikes_rect) # FIXED: Added the missing blit to actually show the spike
+        for spike in spikes_rects2:
+            screen.blit(spikes, spike)
+
+
+# Create these right next to where you defined your boxes and boxes2 lists
+spikes_rects = [
+    pygame.Rect((920, 400 - 30), (30, 30)),     # Level 1 Spike on the box (Adjust 30, 30 to your image size)
+    pygame.Rect((400, ground_y - 30), (30, 30)), # Level 1 Spike on the ground
+]
+
+spikes_rects2 = [
+    pygame.Rect((600, ground_y - 30), (30, 30)), # Level 2 Spike on the ground
+]
+
+
 
 def levels():
     global level, boxes
@@ -63,6 +74,8 @@ def levels():
             boxes.clear()
         if level == 2:
             boxes2.clear()
+    elif player_rect.x <= 25:
+        player_rect.midbottom = (player_start, ground_y)
 
 def moving():
     global velocity_y, on_ground  
@@ -78,9 +91,9 @@ def moving():
         velocity_y = -18
         on_ground = False 
     if keys[pygame.K_LEFT]:
-        player_rect.x -= 20
+        player_rect.x -= 5
     if keys[pygame.K_RIGHT]:
-        player_rect.x += 20
+        player_rect.x += 5
 
     # Apply Gravity
     velocity_y += 1 
@@ -125,9 +138,17 @@ def moving():
 
 def is_touching_danger():
     global alive
-    # FIXED: Re-enabled and checked against spikes_rect instead of the raw image
-    if player_rect.colliderect(spikes_rect):
-        alive = False
+    
+    if level == 1:
+        for spike in spikes_rects:
+            if player_rect.colliderect(spike):
+                alive = False
+                
+    elif level == 2:
+        for spike in spikes_rects2:
+            if player_rect.colliderect(spike):
+                alive = False
+
 
 def living():
     global alive
@@ -142,8 +163,7 @@ while running:
         if event.type == pygame.QUIT:
             running = False
             
-    moving()
-    is_touching_danger() # FIXED: Added back to loop
+    moving() # FIXED: Added back to loop
     living()
     levels()  
 
@@ -166,6 +186,8 @@ while running:
         spikes_func()
         
     screen.blit(player, player_rect)
+
+    is_touching_danger()
 
     pygame.display.flip()
     clock.tick(65) 
