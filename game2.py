@@ -12,8 +12,18 @@ background = pygame.transform.scale(background, screen.get_size())
 
 spikes = pygame.image.load("spike.png")
 
-player = pygame.image.load("player.png")
-player = pygame.transform.scale(player, (40, 100))
+# Load both player directions
+player_right_img = pygame.image.load("player.png")
+player_right_img = pygame.transform.scale(player_right_img, (40, 100))
+
+player_left_img = pygame.image.load("player-left.png")
+player_left_img = pygame.transform.scale(player_left_img, (40, 100))
+
+player_idle_img = pygame.image.load("idle.png")
+player_idle_img = pygame.transform.scale(player_idle_img, (40, 100))
+
+# Set the active player image to start facing right
+player = player_right_img
 
 
 # player vars
@@ -78,7 +88,7 @@ def levels():
         player_rect.midbottom = (player_start, ground_y)
 
 def moving():
-    global velocity_y, on_ground  
+    global velocity_y, on_ground, player  # Added player to globals
     keys = pygame.key.get_pressed()
     
     # Store old positions for collision checks
@@ -90,10 +100,15 @@ def moving():
     if keys[pygame.K_UP] and on_ground:
         velocity_y = -18
         on_ground = False 
+        
     if keys[pygame.K_LEFT]:
         player_rect.x -= 5
-    if keys[pygame.K_RIGHT]:
+        player = player_left_img   # Switch to left image
+    elif keys[pygame.K_RIGHT]:     # Use elif so right takes priority or handles movement smoothly
         player_rect.x += 5
+        player = player_right_img  # Switch to right image\
+    elif not keys[pygame.K_RIGHT] and not keys[pygame.K_LEFT]:
+        player = player_idle_img
 
     # Apply Gravity
     velocity_y += 1 
