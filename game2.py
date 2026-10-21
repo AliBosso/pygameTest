@@ -13,7 +13,7 @@ background = pygame.transform.scale(background, screen.get_size())
 
 spikes = pygame.image.load("spike.png")
 #lavas = pygame.image.load("lava.png")
-
+#heart_rect = pygame.image.load("heart.png")
 
 # Load both player directions
 player_right_img = pygame.image.load("player.png")
@@ -50,7 +50,14 @@ font = pygame.font.SysFont(None, 48)
 def hearts_func():
     global hearts   
     if hearts == 3:
-        pygame.draw.rect(screen, "Red", (700, 0, 50, 50))
+        pygame.draw.rect(screen, "Red", (700, 50, 50, 50))
+        pygame.draw.rect(screen, "Red", (900, 50, 50, 50))
+        pygame.draw.rect(screen, "Red", (1100, 50, 50, 50))
+    elif hearts == 2:
+        pygame.draw.rect(screen, "Red", (900, 50, 50, 50))
+        pygame.draw.rect(screen, "Red", (1100, 50, 50, 50))
+    elif hearts == 1:
+        pygame.draw.rect(screen, "Red", (1100, 50, 50, 50))
 
 def objects(color, position, size):
     pygame.draw.rect(screen, color, pygame.Rect(position, size))
