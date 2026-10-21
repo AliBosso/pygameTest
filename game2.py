@@ -1,4 +1,5 @@
 import pygame
+import sys
 
 pygame.init()
 screen = pygame.display.set_mode((1280, 720))
@@ -11,6 +12,8 @@ background = pygame.image.load("bg.png")
 background = pygame.transform.scale(background, screen.get_size())
 
 spikes = pygame.image.load("spike.png")
+#lavas = pygame.image.load("lava.png")
+
 
 # Load both player directions
 player_right_img = pygame.image.load("player.png")
@@ -33,6 +36,8 @@ on_ground = False
 alive = True  # FIXED: Needs to be global so functions can change it
 deaths = 0
 
+hearts = 3
+
 player_start = 50
 player_rect = player.get_rect(midbottom=(player_start, ground_y))
 
@@ -41,6 +46,11 @@ spikes_rect = spikes.get_rect() # CHANGED: Initialize the rect globally so colli
 
 
 font = pygame.font.SysFont(None, 48)
+
+def hearts_func():
+    global hearts   
+    if hearts == 3:
+        pygame.draw.rect(screen, "Red", (700, 0, 50, 50))
 
 def objects(color, position, size):
     pygame.draw.rect(screen, color, pygame.Rect(position, size))
@@ -69,13 +79,27 @@ def spikes_func():#loops through the objetc list with the positions for the hitb
 
 # Create these right next to where you defined your boxes and boxes2 lists
 spikes_rects = [
-    pygame.Rect((935, 368), (30, 30)),     # Level 1 Spike on the box (Adjust 30, 30 to your image size)
+    pygame.Rect((935, 368), (30, 30)),     # Level 2 Spike on the box (Adjust 30, 30 to your image size)
     pygame.Rect((400, ground_y - 30), (30, 30)), # Level 1 Spike on the ground
 ]
 
 spikes_rects2 = [
-    pygame.Rect((600, ground_y - 30), (30, 30)), # Level 2 Spike on the ground
+    pygame.Rect((600, ground_y - 30), (30, 30)),
+    pygame.Rect((630, ground_y-30), (30, 30)),
+    pygame.Rect((660, ground_y-30), (30, 30)), # Level 3 Spike on the ground
 ]
+
+
+
+
+#def lava_func():
+   # if level == 3:
+  #      lava in lava_rects:
+ #           screen.blit(lavas, lava)
+
+#lavas1  = [
+#pygame.Rect((600, ground_y - 30), (50, 30)),
+#]
 
 
 
@@ -157,6 +181,11 @@ def moving():
                 elif previous_left >= box2.right:
                     player_rect.left = box2.right
 
+    #if level == 3:
+       # for lava in lava1:
+           # if player_rect.colliderect(lava)
+               # player_rect.bottom = 
+
 
 def is_touching_danger():
     global alive
@@ -172,18 +201,18 @@ def is_touching_danger():
                 alive = False
 
 def living():
-    global alive, deaths, level  # Added global keywords here
+    global alive, deaths, level, hearts  # Added hearts global
     if not alive:
         player_rect.midbottom = (player_start, ground_y)  # Reset player position
         velocity_y = 0
         alive = True
         deaths += 1
+        hearts -= 1 # Remove a heart when dying
         
     if deaths == 3:
         level = 1
         deaths = 0  # Reset deaths to 0 so the game loops properly
-
-    
+        hearts = 3  # Reset hearts on game over
 
 
 while running:
@@ -191,8 +220,10 @@ while running:
         if event.type == pygame.QUIT:
             running = False
             
-    moving() # FIXED: Added back to loop
+    # FIXED ORDER: Danger detection must happen before living logic executes
+    is_touching_danger()
     living()
+    moving() 
     levels()  
 
 
@@ -202,6 +233,9 @@ while running:
     # Drawing Everything
     screen.blit(background, (0, 0))
     screen.blit(text_surface, (50, 50))
+    
+    hearts_func()
+    
     if level == 1:
         for box in boxes:
             objects("dark green", box.topleft, box.size)
@@ -213,10 +247,14 @@ while running:
     if level == 3:
         spikes_func()
         
+        
+        
     screen.blit(player, player_rect)
 
-    is_touching_danger()
-
     pygame.display.flip()
-    clock.tick(65) 
+    clock.tick(60)
+
+pygame.quit()
+sys.exit()
+
 
