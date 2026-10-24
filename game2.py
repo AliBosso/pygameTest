@@ -50,11 +50,11 @@ font = pygame.font.SysFont(None, 48)
 def hearts_func():
     global hearts   
     if hearts == 3:
-        pygame.draw.rect(screen, "Red", (700, 50, 50, 50))
         pygame.draw.rect(screen, "Red", (900, 50, 50, 50))
+        pygame.draw.rect(screen, "Red", (1000, 50, 50, 50))
         pygame.draw.rect(screen, "Red", (1100, 50, 50, 50))
     elif hearts == 2:
-        pygame.draw.rect(screen, "Red", (900, 50, 50, 50))
+        pygame.draw.rect(screen, "Red", (1000, 50, 50, 50))
         pygame.draw.rect(screen, "Red", (1100, 50, 50, 50))
     elif hearts == 1:
         pygame.draw.rect(screen, "Red", (1100, 50, 50, 50))
@@ -96,9 +96,6 @@ spikes_rects2 = [
     pygame.Rect((660, ground_y-30), (30, 30)), # Level 3 Spike on the ground
 ]
 
-
-
-
 #def lava_func():
    # if level == 3:
   #      lava in lava_rects:
@@ -107,8 +104,6 @@ spikes_rects2 = [
 #lavas1  = [
 #pygame.Rect((600, ground_y - 30), (50, 30)),
 #]
-
-
 
 def levels():
     global level, boxes
